@@ -62,3 +62,15 @@ export interface Paginated<T> {
     to: number;
     total: number;
 }
+
+export interface Project {
+    id: number;
+    name: string;
+    status: 'em andamento' | 'alerta' | 'finalizado';
+    created_by: number;
+    created_at: string;
+    updated_at: string;
+    creator?: User;
+    users?: User[];
+    activities?: Activity[];
+}
