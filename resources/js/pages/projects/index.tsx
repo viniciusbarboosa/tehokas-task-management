@@ -3,7 +3,6 @@ import { Head, useForm, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import InputError from '@/components/input-error';
 import { type BreadcrumbItem, type Project, type Paginated } from '@/types';
 import { FolderPlus, Search, Filter } from 'lucide-react';
 import ProjectsTable from './components/projectsTable';
@@ -22,6 +21,12 @@ interface ProjectFormData {
     name: string;
 }
 
+type FilterParams = {
+    search?: string;
+    status?: string;
+    per_page?: number;
+};
+
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Projetos', href: '/projetos' },
@@ -38,7 +43,6 @@ export default function Projects({ projects, filters }: Props) {
     const [search, setSearch] = useState(filters.search);
     const [statusFilter, setStatusFilter] = useState(filters.status);
     const [perPage, setPerPage] = useState(filters.per_page.toString());
-    const [initialLoad, setInitialLoad] = useState(true);
     const [searchLoading, setSearchLoading] = useState(false);
 
     const { data, setData, post, put, processing, errors, reset, clearErrors } = useForm<ProjectFormData>(initialFormData);
@@ -96,7 +100,7 @@ export default function Projects({ projects, filters }: Props) {
 
     const applyFilters = () => {
         setSearchLoading(true);
-        const params: any = {};
+        const params: FilterParams = {};
         if (search) params.search = search;
         if (statusFilter) params.status = statusFilter;
         const perPageNum = parseInt(perPage) || 15;
@@ -133,38 +137,23 @@ export default function Projects({ projects, filters }: Props) {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (!initialLoad) {
-                const params: any = {};
-                if (search) params.search = search;
-                if (statusFilter) params.status = statusFilter;
-                const perPageNum = parseInt(perPage) || 15;
-                params.per_page = perPageNum;
+            const params: Record<string, string | number> = {};
+            if (search) params.search = search;
+            if (statusFilter) params.status = statusFilter;
+            params.per_page = parseInt(perPage) || 15;
 
-                router.get('/projetos', params, {
-                    preserveState: true,
-                    replace: true,
-                });
-            }
+            router.get('/projetos', params, {
+                preserveState: true,
+                replace: true,
+            });
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [statusFilter]);
-
-    useEffect(() => {
-        if (!initialLoad) {
-            setSearch(filters.search);
-            setStatusFilter(filters.status);
-            setPerPage(filters.per_page.toString());
-        }
-    }, [filters, initialLoad]);
-
-    useEffect(() => {
-        setInitialLoad(false);
-    }, []);
+    }, [statusFilter, perPage]);
 
     const handlePerPageChange = (value: string) => {
         setPerPage(value);
-        const params: any = {};
+        const params: FilterParams = {};
         if (search) params.search = search;
         if (statusFilter) params.status = statusFilter;
         params.per_page = parseInt(value) || 15;

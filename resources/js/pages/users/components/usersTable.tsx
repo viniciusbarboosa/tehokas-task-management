@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import {
     Table,
@@ -35,7 +34,6 @@ export default function UsersTable({
     onEdit,
     onDelete
 }: UsersTableProps) {
-    const [showMobilePageSelect, setShowMobilePageSelect] = useState(false);
 
     const getTypeDisplay = (type: string) => {
         if (type === 'A') return 'Administrador';
@@ -59,7 +57,7 @@ export default function UsersTable({
         const current = users.current_page;
         const last = users.last_page;
         const delta = 2;
-        let range: number[] = [];
+        const range: number[] = [];
         const rangeWithDots: (number | string)[] = [];
 
         for (let i = 1; i <= last; i++) {
@@ -96,7 +94,8 @@ export default function UsersTable({
     };
 
     const handlePerPageChange = (value: string) => {
-        const params: any = {};
+        const params: Record<string, string | number> = {};
+
         if (search) params.search = search;
         if (typeFilter) params.type = typeFilter;
         params.per_page = parseInt(value) || 15;

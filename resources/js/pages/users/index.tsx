@@ -3,7 +3,6 @@ import { Head, useForm, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import InputError from '@/components/input-error';
 import { type BreadcrumbItem, type User, type Paginated } from '@/types';
 import { UserPlus, Search, Filter } from 'lucide-react';
 import UsersTable from './components/usersTable';
@@ -46,7 +45,6 @@ export default function Users({ users, filters }: Props) {
     const [search, setSearch] = useState(filters.search);
     const [typeFilter, setTypeFilter] = useState(filters.type);
     const [perPage, setPerPage] = useState(filters.per_page.toString());
-    const [initialLoad, setInitialLoad] = useState(true);
     const [searchLoading, setSearchLoading] = useState(false);
 
     const { data, setData, post, put, processing, errors, reset, clearErrors } = useForm<UserFormData>(initialFormData);
@@ -109,7 +107,7 @@ export default function Users({ users, filters }: Props) {
 
     const applyFilters = () => {
         setSearchLoading(true);
-        const params: any = {};
+        const params: Record<string, string | number> = {};
         if (search) params.search = search;
         if (typeFilter) params.type = typeFilter;
         const perPageNum = parseInt(perPage) || 15;
@@ -146,38 +144,23 @@ export default function Users({ users, filters }: Props) {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (!initialLoad) {
-                const params: any = {};
-                if (search) params.search = search;
-                if (typeFilter) params.type = typeFilter;
-                const perPageNum = parseInt(perPage) || 15;
-                params.per_page = perPageNum;
+            const params: Record<string, string | number> = {};
+            if (search) params.search = search;
+            if (typeFilter) params.type = typeFilter;
+            params.per_page = parseInt(perPage) || 15;
 
-                router.get('/usuarios', params, {
-                    preserveState: true,
-                    replace: true,
-                });
-            }
+            router.get('/usuarios', params, {
+                preserveState: true,
+                replace: true,
+            });
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [typeFilter]);
-
-    useEffect(() => {
-        if (!initialLoad) {
-            setSearch(filters.search);
-            setTypeFilter(filters.type);
-            setPerPage(filters.per_page.toString());
-        }
-    }, [filters, initialLoad]);
-
-    useEffect(() => {
-        setInitialLoad(false);
-    }, []);
+    }, [typeFilter, perPage]);
 
     const handlePerPageChange = (value: string) => {
         setPerPage(value);
-        const params: any = {};
+        const params: Record<string, string | number> = {};
         if (search) params.search = search;
         if (typeFilter) params.type = typeFilter;
         params.per_page = parseInt(value) || 15;
@@ -255,7 +238,7 @@ export default function Users({ users, filters }: Props) {
                                 </select>
                             </div>
 
-             
+
                         </div>
 
                         <div className="w-full md:w-40">

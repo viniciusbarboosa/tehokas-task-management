@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import InputError from '@/components/input-error';
 import { type Project } from '@/types';
+import { type LucideIcon } from 'lucide-react';
 import { FolderPlus, Pencil, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface ProjectFormData {
@@ -62,7 +63,7 @@ export default function ProjectFormDialog({
     };
 
     const getStatusIcon = (status: string) => {
-        const icons: Record<string, any> = {
+        const icons: Record<string, LucideIcon> = {
             'em andamento': Clock,
             'alerta': AlertCircle,
             'finalizado': CheckCircle2

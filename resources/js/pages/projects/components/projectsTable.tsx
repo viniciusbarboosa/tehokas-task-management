@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { type Paginated, type Project } from '@/types';
 import { MoreHorizontal, Trash2, Pencil, CheckCircle2, Circle, User, Clock, AlertCircle } from 'lucide-react';
+import { type LucideIcon } from 'lucide-react';
 
 interface ProjectsTableProps {
     projects: Paginated<Project>;
@@ -54,7 +55,7 @@ export default function ProjectsTable({
     };
 
     const getStatusIcon = (status: string) => {
-        const icons: Record<string, any> = {
+        const icons: Record<string, LucideIcon> = {
             'em andamento': Clock,
             'alerta': AlertCircle,
             'finalizado': CheckCircle2
@@ -62,17 +63,8 @@ export default function ProjectsTable({
         return icons[status] || Clock;
     };
 
-    const buildPageUrl = (page: number) => {
-        const params = new URLSearchParams();
-        if (search) params.append('search', search);
-        if (statusFilter) params.append('status', statusFilter);
-        params.append('per_page', perPage);
-        params.append('page', page.toString());
-        return `/projetos?${params.toString()}`;
-    };
-
     const goToPage = (page: number | string) => {
-        const params: any = {};
+        const params: Record<string, string | number> = {};
         if (search) params.search = search;
         if (statusFilter) params.status = statusFilter;
         params.per_page = parseInt(perPage) || 15;
@@ -85,7 +77,7 @@ export default function ProjectsTable({
     };
 
     const handlePerPageChange = (value: string) => {
-        const params: any = {};
+        const params: Record<string, string | number> = {};
         if (search) params.search = search;
         if (statusFilter) params.status = statusFilter;
         params.per_page = parseInt(value) || 15;

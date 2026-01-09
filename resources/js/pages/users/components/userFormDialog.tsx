@@ -70,6 +70,11 @@ export default function UserFormDialog({
                                     ? 'Preencha os dados do novo usuário.'
                                     : 'Atualize as informações do usuário.'}
                             </DialogDescription>
+                            {mode === 'edit' && currentUser && (
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    Editando usuário: <span className="font-medium">{currentUser.name}</span>
+                                </p>
+                            )}
                         </div>
                     </div>
                 </DialogHeader>
