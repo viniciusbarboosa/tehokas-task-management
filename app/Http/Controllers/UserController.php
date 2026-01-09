@@ -11,10 +11,38 @@ use Inertia\Response;
 
 class UserController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $validated = $request->validate([
+            'search' => 'nullable|string|max:255',
+            'type' => 'nullable|string|in:A,U',
+            'per_page' => 'nullable|integer|min:5|max:100',
+        ]);
+
+        $query = User::query();
+
+        if (!empty($validated['search'] ?? '')) {
+            $search = $validated['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        if (!empty($validated['type'] ?? '')) {
+            $query->where('type', $validated['type']);
+        }
+
+        $perPage = $validated['per_page'] ?? 15;
+        $users = $query->latest()->paginate($perPage);
+
         return Inertia::render('users/index', [
-            'users' => User::all(),
+            'users' => $users,
+            'filters' => [
+                'search' => $validated['search'] ?? '',
+                'type' => $validated['type'] ?? '',
+                'per_page' => $perPage,
+            ],
         ]);
     }
 
