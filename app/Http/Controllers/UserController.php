@@ -34,8 +34,8 @@ class UserController extends Controller
         }
 
         $perPage = $validated['per_page'] ?? 15;
-        $users = $query->latest()->paginate($perPage);
-
+        $users = $query->orderBy('name', 'asc')->paginate($perPage);
+        
         return Inertia::render('users/index', [
             'users' => $users,
             'filters' => [
