@@ -34,7 +34,7 @@ class ProjectController extends Controller
 
         $perPage = $validated['per_page'] ?? 15;
         $projects = $query->orderBy('created_at', 'desc')->paginate($perPage);
-        
+
         return Inertia::render('projects/index', [
             'projects' => $projects,
             'filters' => [
@@ -69,9 +69,63 @@ class ProjectController extends Controller
 
         $projeto->update([
             'name' => $request->name,
-           
+
         ]);
 
         return redirect()->route('projetos.index')->with('success', 'Projeto atualizado com sucesso.');
+    }
+
+    //FUNÇOES PARA CAMPO SELECT DE PROJETOS DA SIDEBAR
+    public function accessible(Request $request)
+    {
+        try {
+            $user = auth()->user();
+
+            $page = (int) $request->input('page', 1);
+            $search = (string) $request->input('search', '');
+            $perPage = 20;
+
+            $projects = $user->accessibleProjects($page, $perPage, $search);
+
+            return response()->json([
+                'data' => $projects->items(),
+                'current_page' => $projects->currentPage(),
+                'last_page' => $projects->lastPage(),
+                'total' => $projects->total(),
+                'has_more' => $projects->hasMorePages(),
+            ]);
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'message' => 'Erro interno ao buscar projetos'
+            ], 500);
+            
+        }
+    }
+
+    public function setActive(Request $request)
+    {
+        $request->validate([
+            'project_id' => 'nullable|exists:projects,id',
+        ]);
+
+        $user = auth()->user();
+
+        $user->active_project_id = $request->project_id;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+        ]);
+    }
+
+
+    public function getActive()
+    {
+        $user = auth()->user()->load('activeProject.creator');
+
+        return response()->json([
+            'active_project' => $user->activeProject
+        ]);
     }
 }

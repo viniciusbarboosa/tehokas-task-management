@@ -32,4 +32,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/projetos/{projeto}', [ProjectController::class, 'destroy'])->name('projetos.destroy');
 });
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/projetos/acessiveis', [ProjectController::class, 'accessible'])->name('projetos.acessiveis');
+    Route::post('/projeto/ativo', [ProjectController::class, 'setActive'])->name('projeto.ativo');
+    Route::get('/projeto/ativo', [ProjectController::class, 'getActive'])->name('projeto.ativo.get');
+});
+
 require __DIR__.'/settings.php';

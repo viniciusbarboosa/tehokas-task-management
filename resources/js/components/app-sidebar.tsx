@@ -15,6 +15,7 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
 import AppLogo from './app-logo';
+import ProjectSelect from './project-selector';
 
 const mainNavItems: NavItem[] = [
     {
@@ -52,6 +53,7 @@ export function AppSidebar() {
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
+                
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
@@ -61,6 +63,11 @@ export function AppSidebar() {
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
+
+                <div className="px-3 pb-3">
+                    <ProjectSelect />
+                </div>
+                
             </SidebarHeader>
 
             <SidebarContent>

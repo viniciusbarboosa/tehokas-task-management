@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class User extends Authenticatable
 {
@@ -39,7 +40,7 @@ class User extends Authenticatable
     ];
 
     //CARREGAR PRA SEMPRE O PROJETO ATIVO
-     protected $with = ['activeProject'];
+    protected $with = ['activeProject'];
 
     /**
      * Get the attributes that should be cast.
@@ -61,7 +62,7 @@ class User extends Authenticatable
     public function projects()
     {
         return $this->belongsToMany(Project::class)
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     public function activities()
@@ -93,20 +94,25 @@ class User extends Authenticatable
         $query = Project::query();
 
         if (!$this->isAdmin()) {
-            $query->whereHas('users', function ($q) {
-                $q->where('user_id', $this->id);
+            $query->where(function ($q) {
+                $q->whereHas('users', function ($sub) {
+                    $sub->where('user_id', $this->id);
+                })
+                    ->orWhere('created_by', $this->id);
             });
         }
 
-        if ($search) {
+        if ($search !== '') {
             $query->where('name', 'like', "%{$search}%");
         }
 
-        return $query->with(['creator:id,name'])
-                    ->withCount('users')
-                    ->orderBy('name')
-                    ->paginate($perPage, ['*'], 'page', $page);
+        return $query
+            ->with(['creator:id,name'])
+            ->withCount('users')
+            ->orderBy('name')
+            ->paginate($perPage, ['id', 'name', 'status', 'created_by'], 'page', $page);
     }
+
 
     /**
      * Alterar projeto ativo
@@ -127,8 +133,8 @@ class User extends Authenticatable
      */
     public function canAccessProject(Project $project): bool
     {
-        return $this->isAdmin() || 
-               $project->users()->where('user_id', $this->id)->exists() ||
-               $project->created_by === $this->id;
+        return $this->isAdmin() ||
+            $project->users()->where('user_id', $this->id)->exists() ||
+            $project->created_by === $this->id;
     }
 }

@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Project extends Model
 {
@@ -33,5 +36,31 @@ class Project extends Model
     public function activities()
     {
         return $this->hasMany(Activity::class);
+    }
+
+    /**
+     * Verificar se usuário tem acesso
+     */
+    public function isAccessibleBy(User $user)
+    {
+        return $user->isAdmin() || 
+               $this->users()->where('user_id', $user->id)->exists() ||
+               $this->created_by === $user->id;
+    }
+
+    /**
+     * Escopo para projetos acessíveis
+     */
+    public function scopeAccessibleBy($query, User $user)
+    {
+        if ($user->isAdmin()) {
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($user) {
+            $q->whereHas('users', function ($subQ) use ($user) {
+                $subQ->where('user_id', $user->id);
+            })->orWhere('created_by', $user->id);
+        });
     }
 }
