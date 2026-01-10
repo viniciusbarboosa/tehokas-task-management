@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'type',
+        'active_project_id',
     ];
 
     /**
@@ -36,6 +37,9 @@ class User extends Authenticatable
         'two_factor_recovery_codes',
         'remember_token',
     ];
+
+    //CARREGAR PRA SEMPRE O PROJETO ATIVO
+     protected $with = ['activeProject'];
 
     /**
      * Get the attributes that should be cast.
@@ -65,4 +69,66 @@ class User extends Authenticatable
         return $this->hasMany(Activity::class);
     }
 
+    public function activeProject(): BelongsTo
+    {
+        return $this->belongsTo(Project::class, 'active_project_id');
+    }
+
+    //METODOS
+    public function isAdmin(): bool
+    {
+        return $this->type === 'A';
+    }
+
+    public function isUser(): bool
+    {
+        return $this->type === 'U';
+    }
+
+    /**
+     * Obter projetos acessíveis (com paginação para scroll infinito)
+     */
+    public function accessibleProjects(int $page = 1, int $perPage = 20, string $search = '')
+    {
+        $query = Project::query();
+
+        if (!$this->isAdmin()) {
+            $query->whereHas('users', function ($q) {
+                $q->where('user_id', $this->id);
+            });
+        }
+
+        if ($search) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        return $query->with(['creator:id,name'])
+                    ->withCount('users')
+                    ->orderBy('name')
+                    ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    /**
+     * Alterar projeto ativo
+     */
+    public function setActiveProject(Project $project): bool
+    {
+        // Verificar acesso
+        if (!$this->canAccessProject($project)) {
+            return false;
+        }
+
+        $this->active_project_id = $project->id;
+        return $this->save();
+    }
+
+    /**
+     * Verificar se usuário tem acesso ao projeto
+     */
+    public function canAccessProject(Project $project): bool
+    {
+        return $this->isAdmin() || 
+               $project->users()->where('user_id', $this->id)->exists() ||
+               $project->created_by === $this->id;
+    }
 }
