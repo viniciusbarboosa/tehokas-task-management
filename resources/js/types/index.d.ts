@@ -70,6 +70,7 @@ export interface Project {
     created_by: number;
     created_at: string;
     updated_at: string;
+    users_count;
     creator?: User;
     users?: User[];
     activities?: Activity[];

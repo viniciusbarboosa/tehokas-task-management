@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -19,7 +20,7 @@ class ProjectController extends Controller
             'per_page' => 'nullable|integer|min:5|max:100',
         ]);
 
-        $query = Project::with('creator');
+        $query = Project::with('creator')->withCount('users');
 
         if (!empty($validated['search'] ?? '')) {
             $search = $validated['search'];
@@ -75,6 +76,108 @@ class ProjectController extends Controller
         return redirect()->route('projetos.index')->with('success', 'Projeto atualizado com sucesso.');
     }
 
+    //METODOS PARA GERENCIAR USAURIOS DO PROJETO
+    public function getUsers(Project $projeto, Request $request)
+    {
+        $perPage = $request->input('per_page', 20);
+        $page = $request->input('page', 1);
+        $search = $request->input('search', '');
+        
+        // CORREÇÃO: Especificar tabela users
+        $currentUsers = $projeto->users()
+            ->select('users.id', 'users.name', 'users.email', 'users.type')
+            ->orderBy('users.name')
+            ->get();
+        
+        $availableUsersQuery = User::query()
+            ->whereNotIn('id', $currentUsers->pluck('id'));
+        
+        if ($search) {
+            $availableUsersQuery->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+        
+        $availableUsers = $availableUsersQuery
+            ->orderBy('name')
+            ->paginate($perPage, ['id', 'name', 'email', 'type'], 'page', $page);
+        
+        return response()->json([
+            'current_users' => $currentUsers,
+            'available_users' => [
+                'data' => $availableUsers->items(),
+                'current_page' => $availableUsers->currentPage(),
+                'last_page' => $availableUsers->lastPage(),
+                'total' => $availableUsers->total(),
+                'has_more' => $availableUsers->hasMorePages(),
+            ],
+        ]);
+    }
+
+    public function addUser(Request $request, Project $projeto)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $projeto->users()->syncWithoutDetaching([$request->user_id]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Usuário adicionado ao projeto.',
+            'users_count' => $projeto->users()->count(),
+        ]);
+    }
+
+    public function removeUser(Request $request, Project $projeto)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $projeto->users()->detach($request->user_id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Usuário removido do projeto.',
+            'users_count' => $projeto->users()->count(),
+        ]);
+    }
+
+    public function searchAvailableUsers(Project $projeto, Request $request)
+    {
+        $perPage = $request->input('per_page', 20);
+        $page = $request->input('page', 1);
+        $search = $request->input('search', '');
+        
+        // CORREÇÃO: Usar subquery para evitar ambiguidade
+        $query = User::query()
+            ->whereNotIn('id', function($q) use ($projeto) {
+                $q->select('user_id')
+                  ->from('project_user')
+                  ->where('project_id', $projeto->id);
+            });
+        
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+        
+        $users = $query->orderBy('name')
+            ->paginate($perPage, ['id', 'name', 'email', 'type'], 'page', $page);
+        
+        return response()->json([
+            'data' => $users->items(),
+            'current_page' => $users->currentPage(),
+            'last_page' => $users->lastPage(),
+            'total' => $users->total(),
+            'has_more' => $users->hasMorePages(),
+        ]);
+    }
+
     //FUNÇOES PARA CAMPO SELECT DE PROJETOS DA SIDEBAR
     public function accessible(Request $request)
     {
@@ -99,7 +202,7 @@ class ProjectController extends Controller
             return response()->json([
                 'message' => 'Erro interno ao buscar projetos'
             ], 500);
-            
+
         }
     }
 
