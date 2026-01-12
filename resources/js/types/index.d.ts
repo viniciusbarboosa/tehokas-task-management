@@ -75,3 +75,17 @@ export interface Project {
     users?: User[];
     activities?: Activity[];
 }
+
+export type TaskStatus = 'pendente' | 'em andamento' | 'concluida';
+
+export interface Task {
+    id: number;
+    project_id: number;
+    title: string;
+    description: string | null;
+    status: TaskStatus;
+    deadline: string;
+    created_at: string;
+    updated_at: string;
+    project?: Project;
+}

@@ -33,6 +33,11 @@ const mainNavItems: NavItem[] = [
         href: "/usuarios",
         icon: LayoutGrid,
     },
+    {
+        title: 'Tarefas',
+        href: "/tarefas",
+        icon: LayoutGrid,
+    },
     
 ];
 
