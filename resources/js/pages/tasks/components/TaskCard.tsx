@@ -1,17 +1,18 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@/components/ui/button';
-import { Calendar, Pencil } from 'lucide-react';
+import { Calendar, Pencil,Eye } from 'lucide-react';
 import { type Task } from '@/types';
 
 interface TaskCardProps {
     task: Task;
     onEdit: (task: Task) => void;
     onDelete: (task: Task) => void;
+    onViewDetails?: (task: Task) => void;
     isDragging?: boolean;
 }
 
-export default function TaskCard({ task, onEdit, onDelete, isDragging }: TaskCardProps) {
+export default function TaskCard({ task, onEdit, onDelete,onViewDetails, isDragging }: TaskCardProps) {
     const {
         attributes,
         listeners,
@@ -87,6 +88,22 @@ export default function TaskCard({ task, onEdit, onDelete, isDragging }: TaskCar
                     </div>
                     
                     <div className="flex gap-1">
+
+                        {onViewDetails && (
+                            <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-200"
+                                onClick={(e) => { 
+                                    e.stopPropagation(); 
+                                    onViewDetails(task); 
+                                }}
+                                onPointerDown={(e) => e.stopPropagation()} 
+                            >
+                                <Eye className="h-4 w-4" />
+                            </Button>
+                        )}
+
                         <Button
                             size="icon"
                             variant="ghost"

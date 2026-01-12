@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Trello, AlertCircle, Users, Folder } from 'lucide-react';
 import { type Task, type Project, type BreadcrumbItem } from '@/types';
+import TaskDetailsDialog from './components/TaskDetailsDialog';
 
 interface TasksPageProps {
     project: Project;
@@ -71,6 +72,8 @@ export default function TasksIndex({ project, tasks, stats }: TasksPageProps) {
     const [activeTask, setActiveTask] = useState<Task | null>(null);
     const [taskDialogOpen, setTaskDialogOpen] = useState(false);
     const [editingTask, setEditingTask] = useState<Task | null>(null);
+    const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -121,10 +124,10 @@ export default function TasksIndex({ project, tasks, stats }: TasksPageProps) {
 
         const taskId = active.id as string;
         let newStatus = over.id as string;
-        
+
         // Verifica se soltou sobre outra tarefa para descobrir a coluna correta
         const overTaskCheck = [...tasks.pendente, ...tasks.em_andamento, ...tasks.concluida].find(t => t.id.toString() === newStatus);
-        
+
         if (overTaskCheck) {
             if (tasks.pendente.some(t => t.id.toString() === newStatus)) newStatus = 'pendente';
             else if (tasks.em_andamento.some(t => t.id.toString() === newStatus)) newStatus = 'em_andamento';
@@ -170,6 +173,25 @@ export default function TasksIndex({ project, tasks, stats }: TasksPageProps) {
             if (response.ok) router.reload();
         } catch (error) {
             console.error('Erro ao excluir tarefa:', error);
+        }
+    };
+
+    const handleViewDetails = (task: Task) => {
+        setSelectedTask(task);
+        setDetailsDialogOpen(true);
+    };
+
+    const handleUpdateStatus = async (taskId: number, newStatus: string) => {
+        try {
+            await router.put(`/tarefas/${taskId}/status`, {
+                status: newStatus,
+            }, {
+                preserveState: true,
+                only: ['tasks', 'stats'],
+            });
+        } catch (error) {
+            console.error('Erro ao atualizar status:', error);
+            throw error; 
         }
     };
 
@@ -278,6 +300,7 @@ export default function TasksIndex({ project, tasks, stats }: TasksPageProps) {
                                 tasks={column.tasks}
                                 onEditTask={handleEditTask}
                                 onDeleteTask={handleDeleteTask}
+                                onViewTask={handleViewDetails}
                             />
                         ))}
                     </div>
@@ -302,6 +325,14 @@ export default function TasksIndex({ project, tasks, stats }: TasksPageProps) {
                 task={editingTask}
                 onSuccess={() => router.reload()}
             />
+
+            <TaskDetailsDialog
+                open={detailsDialogOpen}
+                onOpenChange={setDetailsDialogOpen}
+                task={selectedTask}
+                onUpdateStatus={handleUpdateStatus}
+            />
+
         </AppLayout>
     );
 }
