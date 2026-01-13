@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'type',
         'active_project_id',
+        'admin_main',
     ];
 
     /**

@@ -23,6 +23,7 @@ class CreateAdminMainSeeder extends Seeder
                 'name' => 'tehokas',
                 'password' => Hash::make('tehokas123'),
                 'type' => 'A',
+                'admin_main' =>true
             ]
         );
     }
