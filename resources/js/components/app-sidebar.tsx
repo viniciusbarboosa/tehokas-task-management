@@ -16,6 +16,8 @@ import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, Kanban, LayoutGrid, User2Icon } from 'lucide-react';
 import AppLogo from './app-logo';
 import ProjectSelect from './project-selector';
+import { usePage } from '@inertiajs/react';
+import { User } from '@/types';
 
 const mainNavItems: NavItem[] = [
     {
@@ -50,6 +52,21 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { props } = usePage<{ auth: { user: User } }>();
+    const user = props.auth.user;
+
+    const filteredMainNavItems = mainNavItems.filter(item => {
+        if (item.title === 'Usuários' && user.type !== 'A') {
+            return false;
+        }
+
+        if (item.title === 'Projetos' && user.type !== 'A') {
+            return false;
+        }
+        
+        return true;
+    });
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -73,7 +90,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={filteredMainNavItems} />
             </SidebarContent>
 
             <SidebarFooter>

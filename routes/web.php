@@ -20,14 +20,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index');
+    Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index')->middleware('admin.only');;
     Route::post('/usuarios', [UserController::class, 'store'])->name('usuarios.store');
     Route::put('/usuarios/{usuario}', [UserController::class, 'update'])->name('usuarios.update');
     Route::delete('/usuarios/{usuario}', [UserController::class, 'destroy'])->name('usuarios.destroy');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/projetos', [ProjectController::class, 'index'])->name('projetos.index');
+    Route::get('/projetos', [ProjectController::class, 'index'])->name('projetos.index')->middleware('admin.only');;
     Route::post('/projetos', [ProjectController::class, 'store'])->name('projetos.store');
     Route::put('/projetos/{projeto}', [ProjectController::class, 'update'])->name('projetos.update');
     Route::delete('/projetos/{projeto}', [ProjectController::class, 'destroy'])->name('projetos.destroy');
