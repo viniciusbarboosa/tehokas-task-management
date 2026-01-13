@@ -61,13 +61,16 @@ export default function TaskFormDialog({
         try {
             const url = task ? `/tarefas/${task.id}` : '/tarefas';
             const method = task ? 'PUT' : 'POST';
-            
+
             const response = await fetch(url, {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                    'X-XSRF-TOKEN': decodeURIComponent(
+                        document.cookie.split('; ').find(c => c.startsWith('XSRF-TOKEN='))?.split('=')[1] || ''
+                    ),
                 },
+
                 body: JSON.stringify({
                     ...formData,
                     project_id: projectId,

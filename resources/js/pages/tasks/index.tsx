@@ -167,7 +167,10 @@ export default function TasksIndex({ project, tasks, stats }: TasksPageProps) {
             const response = await fetch(`/tarefas/${task.id}`, {
                 method: 'DELETE',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                    'Content-Type': 'application/json',
+                    'X-XSRF-TOKEN': decodeURIComponent(
+                        document.cookie.split('; ').find(c => c.startsWith('XSRF-TOKEN='))?.split('=')[1] || ''
+                    ),
                 },
             });
             if (response.ok) router.reload();
