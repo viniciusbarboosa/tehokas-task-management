@@ -170,7 +170,7 @@ export default function ProjectSelect() {
                 PROJETO ATUAL
             </div>
             
-            <div className="flex gap-1">
+            <div className="flex w-full gap-1">
                 <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                         <Button

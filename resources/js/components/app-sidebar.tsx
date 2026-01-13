@@ -13,7 +13,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, Folder, Kanban, LayoutGrid, User2Icon } from 'lucide-react';
 import AppLogo from './app-logo';
 import ProjectSelect from './project-selector';
 
@@ -26,31 +26,26 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Projetos',
         href: "/projetos",
-        icon: LayoutGrid,
+        icon: Folder, 
     },
     {
         title: 'Usuários',
         href: "/usuarios",
-        icon: LayoutGrid,
+        icon: User2Icon, 
     },
     {
-        title: 'Tarefas',
+        title: 'Quadro de Tarefas',
         href: "/tarefas",
-        icon: LayoutGrid,
+        icon: Kanban,
     },
-    
+
 ];
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
+        title: 'Repositorio',
+        href: 'https://github.com/viniciusbarboosa/tehokas-task-management',
         icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
     },
 ];
 
@@ -63,15 +58,17 @@ export function AppSidebar() {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link href={dashboard()} prefetch>
-                                <AppLogo />
+                                <img 
+                                    src="/images/tehokaslogopngnomeelogo.png" 
+                                    alt="Tehokas Logo"
+                                    className="w-40 h-auto"
+                                />
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
 
-                <div className="px-3 pb-3">
-                    <ProjectSelect />
-                </div>
+                <ProjectSelect />   
                 
             </SidebarHeader>
 
