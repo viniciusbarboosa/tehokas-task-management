@@ -35,7 +35,7 @@ export default function ProjectSelect() {
     const { props } = usePage<{ auth: { user: User } }>()
     const user = props.auth.user
     const activeProject = user.active_project
-    
+
     const [open, setOpen] = useState(false)
     const [projects, setProjects] = useState<Project[]>([])
     const [search, setSearch] = useState("")
@@ -107,17 +107,22 @@ export default function ProjectSelect() {
         }
     }
 
+    function getCsrfToken() {
+        return document.cookie
+            .split("; ")
+            .find(row => row.startsWith("XSRF-TOKEN="))
+            ?.split("=")[1]
+    }
+
     async function handleSelect(project: Project) {
         try {
-            const token = document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute("content")
+            const token = decodeURIComponent(getCsrfToken() ?? "")
 
             const res = await fetch("/projeto/ativo", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": token ?? "",
+                    "X-XSRF-TOKEN": token,
                 },
                 body: JSON.stringify({
                     project_id: project.id,
@@ -137,20 +142,18 @@ export default function ProjectSelect() {
     //Limpa projeto
     async function handleClearProject() {
         if (!activeProject) return
-        
+
         try {
-            const token = document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute("content")
+            const token = decodeURIComponent(getCsrfToken() ?? "")
 
             const res = await fetch("/projeto/ativo", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": token ?? "",
+                    "X-XSRF-TOKEN": token,
                 },
                 body: JSON.stringify({
-                    project_id: null, //Envia null para "deletar"
+                    project_id: null,
                 }),
             })
 
@@ -169,13 +172,13 @@ export default function ProjectSelect() {
             <div className="mb-2 text-xs font-medium text-gray-500">
                 PROJETO ATUAL
             </div>
-            
-            <div className="flex w-full gap-1">
+
+            <div className="flex gap-1">
                 <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                         <Button
                             variant="outline"
-                            className="w-full justify-between truncate" 
+                            className="w-full justify-between truncate"
                         >
                             <div className="flex items-center gap-2 truncate">
                                 <Folder className="h-4 w-4 flex-shrink-0" />
@@ -227,7 +230,7 @@ export default function ProjectSelect() {
                         </Command>
                     </PopoverContent>
                 </Popover>
-                
+
                 {activeProject && (
                     <Button
                         variant="outline"
