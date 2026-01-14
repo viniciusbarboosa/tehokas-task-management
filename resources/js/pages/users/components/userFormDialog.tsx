@@ -33,6 +33,7 @@ interface UserFormDialogProps {
     onSubmit: (e: FormEvent) => void;
     onCancel: () => void;
     updateField: (field: keyof UserFormData, value: string) => void;
+    authUser: User;
 }
 
 export default function UserFormDialog({
@@ -45,7 +46,8 @@ export default function UserFormDialog({
     processing,
     onSubmit,
     onCancel,
-    updateField
+    updateField,
+    authUser
 }: UserFormDialogProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -134,22 +136,34 @@ export default function UserFormDialog({
                             </label>
 
                             <label
-                                className={`flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border p-3 transition-colors ${data.type === 'A'
-                                    ? 'border-purple-500 bg-purple-50 dark:border-purple-500 dark:bg-purple-900/20'
-                                    : 'border-sidebar-border/70 hover:bg-gray-50 dark:border-sidebar-border dark:hover:bg-gray-900/30'
-                                    }`}
+                                className={`flex flex-1 items-center justify-center gap-2 rounded-lg border p-3 transition-colors
+        ${data.type === 'A'
+                                        ? 'border-purple-500 bg-purple-50 dark:border-purple-500 dark:bg-purple-900/20'
+                                        : 'border-sidebar-border/70 hover:bg-gray-50 dark:border-sidebar-border dark:hover:bg-gray-900/30'
+                                    }
+        ${!authUser.admin_main
+                                        ? 'opacity-40 cursor-not-allowed'
+                                        : 'cursor-pointer'
+                                    }
+    `}
                             >
                                 <input
                                     type="radio"
                                     name="type"
                                     value="A"
                                     checked={data.type === 'A'}
-                                    onChange={(e) => updateField('type', e.target.value)}
+                                    onChange={(e) => {
+                                        if (!authUser.admin_main) return; 
+                                        updateField('type', e.target.value);
+                                    }}
+                                    disabled={!authUser.admin_main}
                                     className="sr-only"
                                 />
                                 <Shield className="h-4 w-4" />
                                 <span className="text-sm font-medium">Administrador</span>
                             </label>
+
+
                         </div>
 
                         <InputError message={errors.type} className="mt-1" />

@@ -15,6 +15,7 @@ interface Props {
         type: string;
         per_page: number;
     };
+    authUser: User;
 }
 
 interface UserFormData {
@@ -38,7 +39,7 @@ const initialFormData: UserFormData = {
     type: 'U',
 };
 
-export default function Users({ users, filters }: Props) {
+export default function Users({ users, filters,authUser }: Props) {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [mode, setMode] = useState<'create' | 'edit'>('create');
     const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -272,6 +273,7 @@ export default function Users({ users, filters }: Props) {
                     perPage={perPage}
                     onEdit={openEditDialog}
                     onDelete={deleteUser}
+                    authUser={authUser}
                 />
             </div>
 
@@ -286,6 +288,7 @@ export default function Users({ users, filters }: Props) {
                 onSubmit={handleSubmit}
                 onCancel={handleCancelForm}
                 updateField={updateField}
+                authUser={authUser}
             />
 
         </AppLayout>

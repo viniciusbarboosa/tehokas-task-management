@@ -24,6 +24,7 @@ interface UsersTableProps {
     perPage: string;
     onEdit: (user: User) => void;
     onDelete: (user: User) => void;
+    authUser: User;
 }
 
 export default function UsersTable({
@@ -32,7 +33,8 @@ export default function UsersTable({
     typeFilter,
     perPage,
     onEdit,
-    onDelete
+    onDelete,
+    authUser,
 }: UsersTableProps) {
 
     const getTypeDisplay = (type: string) => {
@@ -99,7 +101,7 @@ export default function UsersTable({
         if (search) params.search = search;
         if (typeFilter) params.type = typeFilter;
         params.per_page = parseInt(value) || 15;
-        
+
         router.get('/usuarios', params, {
             preserveState: true,
             replace: true,
@@ -171,13 +173,17 @@ export default function UsersTable({
                                                 align="end"
                                                 className="w-40 border border-sidebar-border/70 dark:border-sidebar-border"
                                             >
-                                                <DropdownMenuItem
-                                                    onClick={() => onEdit(user)}
-                                                    className="cursor-pointer text-gray-700 dark:text-gray-300"
-                                                >
-                                                    <Pencil className="mr-2 h-4 w-4" />
-                                                    Editar
-                                                </DropdownMenuItem>
+                                                
+                                                {!(user.type == 'A' && !authUser.admin_main) && (
+                                                        <DropdownMenuItem
+                                                            onClick={() => onEdit(user)}
+                                                            className="cursor-pointer text-gray-700 dark:text-gray-300"
+                                                        >
+                                                            <Pencil className="mr-2 h-4 w-4" />
+                                                            Editar
+                                                        </DropdownMenuItem>
+                                                    )}
+
                                                 <DropdownMenuItem
                                                     onClick={() => onDelete(user)}
                                                     className="cursor-pointer text-red-600 focus:text-red-600 dark:text-red-400"

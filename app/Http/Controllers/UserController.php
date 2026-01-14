@@ -43,6 +43,7 @@ class UserController extends Controller
                 'type' => $validated['type'] ?? '',
                 'per_page' => $perPage,
             ],
+            'authUser' => auth()->user(),
         ]);
     }
 
