@@ -41,6 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/projetos/{projeto}/buscar-usuarios-disponiveis', [ProjectController::class, 'searchAvailableUsers']);
     Route::post('/projetos/{projeto}/adicionar-usuario', [ProjectController::class, 'addUser']);
     Route::post('/projetos/{projeto}/remover-usuario', [ProjectController::class, 'removeUser']);
+    Route::put('/projetos/{projeto}/finalizar', [App\Http\Controllers\ProjectController::class, 'finish'])->name('projetos.finalizar');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

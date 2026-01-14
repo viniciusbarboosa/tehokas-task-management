@@ -85,6 +85,15 @@ class ProjectController extends Controller
         return redirect()->route('projetos.index')->with('success', 'Projeto atualizado com sucesso.');
     }
 
+    public function finish(Project $projeto)
+    {
+        $projeto->update([
+            'status' => 'finalizado'
+        ]);
+
+        return redirect()->back()->with('success', 'Projeto finalizado com sucesso!');
+    }
+
     //METODOS PARA GERENCIAR USAURIOS DO PROJETO
     public function getUsers(Project $projeto, Request $request)
     {

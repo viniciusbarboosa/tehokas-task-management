@@ -7,6 +7,16 @@ import { type BreadcrumbItem, type Project, type Paginated } from '@/types';
 import { FolderPlus, Search, Filter } from 'lucide-react';
 import ProjectsTable from './components/projectsTable';
 import ProjectFormDialog from './components/projectFormDialog';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Props {
     projects: Paginated<Project>;
@@ -46,6 +56,26 @@ export default function Projects({ projects, filters }: Props) {
     const [searchLoading, setSearchLoading] = useState(false);
 
     const { data, setData, post, put, processing, errors, reset, clearErrors } = useForm<ProjectFormData>(initialFormData);
+
+    const [finalizeDialogOpen, setFinalizeDialogOpen] = useState(false);
+    const [projectToFinalize, setProjectToFinalize] = useState<Project | null>(null);
+
+    const openFinalizeDialog = (project: Project) => {
+        setProjectToFinalize(project);
+        setFinalizeDialogOpen(true);
+    };
+
+    const confirmFinalize = () => {
+        if (projectToFinalize) {
+            router.put(`/projetos/${projectToFinalize.id}/finalizar`, {}, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setFinalizeDialogOpen(false);
+                    setProjectToFinalize(null);
+                }
+            });
+        }
+    };
 
     const openCreateDialog = () => {
         setMode('create');
@@ -263,6 +293,7 @@ export default function Projects({ projects, filters }: Props) {
                     perPage={perPage}
                     onEdit={openEditDialog}
                     onDelete={deleteProject}
+                    onFinish={openFinalizeDialog}
                 />
             </div>
 
@@ -278,6 +309,32 @@ export default function Projects({ projects, filters }: Props) {
                 onCancel={handleCancelForm}
                 updateField={updateField}
             />
+
+
+            <AlertDialog open={finalizeDialogOpen} onOpenChange={setFinalizeDialogOpen}>
+                <AlertDialogContent className="border-sidebar-border/70 dark:border-sidebar-border">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-gray-900 dark:text-gray-100">
+                            Finalizar Projeto
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-gray-600 dark:text-gray-400">
+                            Tem certeza que deseja marcar <strong>{projectToFinalize?.name}</strong> como finalizado?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel className="border-sidebar-border/70 dark:border-sidebar-border dark:text-gray-300">
+                            Cancelar
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={confirmFinalize}
+                            className="bg-green-600 hover:bg-green-700 text-white dark:bg-green-700"
+                        >
+                            Confirmar
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
         </AppLayout>
     );
 }

@@ -13,10 +13,11 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { type Paginated, type Project } from '@/types';
-import { MoreHorizontal, Trash2, Pencil, CheckCircle2, Circle, User as UserIcon, Clock, AlertCircle, Users, UserPlus } from 'lucide-react';
+import { MoreHorizontal, Trash2, Pencil, CheckCircle2, Circle, User as UserIcon, Clock, AlertCircle, Users, UserPlus, CheckSquare } from 'lucide-react';
 import { type LucideIcon } from 'lucide-react';
 import { ProjectUsersDialog } from './ProjectUsersDialog';
 
@@ -27,6 +28,7 @@ interface ProjectsTableProps {
     perPage: string;
     onEdit: (project: Project) => void;
     onDelete: (project: Project) => void;
+    onFinish: (project: Project) => void;
 }
 
 export default function ProjectsTable({
@@ -35,7 +37,8 @@ export default function ProjectsTable({
     statusFilter,
     perPage,
     onEdit,
-    onDelete
+    onDelete,
+    onFinish
 }: ProjectsTableProps) {
     const [manageUsersOpen, setManageUsersOpen] = useState(false);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -195,6 +198,7 @@ export default function ProjectsTable({
                                                         <Pencil className="mr-2 h-4 w-4" />
                                                         Editar
                                                     </DropdownMenuItem>
+
                                                     <DropdownMenuItem
                                                         onClick={() => openManageUsers(project)}
                                                         className="cursor-pointer text-gray-700 dark:text-gray-300"
@@ -202,13 +206,26 @@ export default function ProjectsTable({
                                                         <UserPlus className="mr-2 h-4 w-4" />
                                                         Gerenciar Usuários
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem
+
+                                                    <DropdownMenuSeparator className="bg-sidebar-border/70 dark:bg-sidebar-border" />
+
+                                                    {project.status !== 'finalizado' && (
+                                                        <DropdownMenuItem
+                                                            onClick={() => onFinish(project)}
+                                                            className="cursor-pointer text-green-700 focus:text-green-700 dark:text-green-400"
+                                                        >
+                                                            <CheckSquare className="mr-2 h-4 w-4" />
+                                                            Finalizar Projeto
+                                                        </DropdownMenuItem>
+                                                    )}
+
+                                                    {/**  <DropdownMenuItem
                                                         onClick={() => onDelete(project)}
                                                         className="cursor-pointer text-red-600 focus:text-red-600 dark:text-red-400"
                                                     >
                                                         <Trash2 className="mr-2 h-4 w-4" />
                                                         Excluir
-                                                    </DropdownMenuItem>
+                                                    </DropdownMenuItem>*/}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </TableCell>
