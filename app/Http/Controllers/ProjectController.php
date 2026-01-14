@@ -20,7 +20,16 @@ class ProjectController extends Controller
             'per_page' => 'nullable|integer|min:5|max:100',
         ]);
 
-        $query = Project::with('creator')->withCount('users');
+        $query = Project::with('creator')
+            ->withCount('users')
+            ->withCount([
+                'tasks as tasks_total',
+                'tasks as tasks_late' => function ($q) {
+                    $q->where('status', '!=', 'finalizada')
+                    ->whereDate('deadline', '<', now());
+                }
+            ]);
+
 
         if (!empty($validated['search'] ?? '')) {
             $search = $validated['search'];

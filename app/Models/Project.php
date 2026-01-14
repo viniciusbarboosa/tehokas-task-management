@@ -15,7 +15,7 @@ class Project extends Model
     protected $fillable = [
         'name',
         'status',
-        'created_by', 
+        'created_by',
     ];
 
 
@@ -30,7 +30,7 @@ class Project extends Model
     public function users()
     {
         return $this->belongsToMany(User::class)
-                    ->withPivot('project_id', 'user_id');
+            ->withPivot('project_id', 'user_id');
     }
 
     public function activities()
@@ -38,14 +38,19 @@ class Project extends Model
         return $this->hasMany(Activity::class);
     }
 
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
+
     /**
      * Verificar se usuário tem acesso
      */
     public function isAccessibleBy(User $user)
     {
-        return $user->isAdmin() || 
-               $this->users()->where('user_id', $user->id)->exists() ||
-               $this->created_by === $user->id;
+        return $user->isAdmin() ||
+            $this->users()->where('user_id', $user->id)->exists() ||
+            $this->created_by === $user->id;
     }
 
     /**

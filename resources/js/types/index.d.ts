@@ -74,6 +74,8 @@ export interface Project {
     creator?: User;
     users?: User[];
     activities?: Activity[];
+    tasks_total?: number;
+    tasks_late?: number;
 }
 
 export type TaskStatus = 'pendente' | 'em andamento' | 'concluida';

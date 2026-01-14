@@ -40,32 +40,38 @@ export default function ProjectsTable({
     const [manageUsersOpen, setManageUsersOpen] = useState(false);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-    const getStatusDisplay = (status: string) => {
-        const statusMap: Record<string, string> = {
-            'em andamento': 'Em Andamento',
-            'alerta': 'Alerta',
-            'finalizado': 'Finalizado'
-        };
-        return statusMap[status] || status;
+    const getStatusDisplay = (project: Project) => {
+        if (isProjectInAlert(project)) return 'Em Alerta';
+
+        return project.status === 'finalizado'
+            ? 'Finalizado'
+            : 'Em Andamento';
     };
 
-    const getStatusColor = (status: string) => {
-        const colors: Record<string, string> = {
-            'em andamento': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-            'alerta': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-            'finalizado': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-        };
-        return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+    const getStatusColor = (project: Project) => {
+        if (isProjectInAlert(project))
+            return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+
+        if (project.status === 'finalizado')
+            return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
     };
 
-    const getStatusIcon = (status: string) => {
-        const icons: Record<string, LucideIcon> = {
-            'em andamento': Clock,
-            'alerta': AlertCircle,
-            'finalizado': CheckCircle2
-        };
-        return icons[status] || Clock;
+    const getStatusIcon = (project: Project) => {
+        if (isProjectInAlert(project)) return AlertCircle;
+        if (project.status === 'finalizado') return CheckCircle2;
+        return Clock;
     };
+
+    const isProjectInAlert = (project: Project) => {
+        if (project.status !== 'em andamento') return false;
+
+        const late = project.tasks_late ?? 0;
+
+        return late > 0;
+    };
+
 
     const openManageUsers = (project: Project) => {
         setSelectedProject(project);
@@ -126,7 +132,7 @@ export default function ProjectsTable({
 
                         <TableBody>
                             {projects.data.map((project) => {
-                                const StatusIcon = getStatusIcon(project.status);
+                                const StatusIcon = getStatusIcon(project);
                                 return (
                                     <TableRow
                                         key={project.id}
@@ -145,8 +151,10 @@ export default function ProjectsTable({
                                         <TableCell>
                                             <div className="flex items-center gap-2">
                                                 <StatusIcon className="h-4 w-4" />
-                                                <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${getStatusColor(project.status)}`}>
-                                                    {getStatusDisplay(project.status)}
+                                                <span
+                                                    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${getStatusColor(project)}`}
+                                                >
+                                                    {getStatusDisplay(project)}
                                                 </span>
                                             </div>
                                         </TableCell>
@@ -208,7 +216,7 @@ export default function ProjectsTable({
                                 );
                             })}
                         </TableBody>
-                        
+
                     </Table>
                 </div>
 
