@@ -16,7 +16,7 @@ import { edit } from '@/routes/profile';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Profile settings',
+        title: 'Configurações de perfil',
         href: edit().url,
     },
 ];
@@ -32,15 +32,15 @@ export default function Profile({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Profile settings" />
+            <Head title="Configurações de perfil" />
 
-            <h1 className="sr-only">Profile Settings</h1>
+            <h1 className="sr-only">Configurações de perfil</h1>
 
             <SettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall
-                        title="Profile information"
-                        description="Update your name and email address"
+                        title="Informações do perfil"
+                        description="Atualize seu nome e endereço de e-mail"
                     />
 
                     <Form
@@ -53,7 +53,7 @@ export default function Profile({
                         {({ processing, recentlySuccessful, errors }) => (
                             <>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="name">Name</Label>
+                                    <Label htmlFor="name">Nome</Label>
 
                                     <Input
                                         id="name"
@@ -72,7 +72,7 @@ export default function Profile({
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="email">Email address</Label>
+                                    <Label htmlFor="email">Email </Label>
 
                                     <Input
                                         id="email"
@@ -83,6 +83,7 @@ export default function Profile({
                                         required
                                         autoComplete="username"
                                         placeholder="Email address"
+                                        disabled={true}
                                     />
 
                                     <InputError
@@ -143,7 +144,7 @@ export default function Profile({
                     </Form>
                 </div>
 
-                <DeleteUser />
+                {/*<DeleteUser />*/}
             </SettingsLayout>
         </AppLayout>
     );
