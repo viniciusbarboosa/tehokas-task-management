@@ -4,6 +4,15 @@ Este projeto foi desenvolvido como parte do desafio técnico para a **Tehokas**,
 
 ---
 
+# Deploy do projeto
+Caso queria ver ele no ar
+Link: https://srv1266759.hstgr.cloud/
+
+#### 🔑 Credenciais de Acesso (Admin principal)
+
+-   **E-mail:** `tehokassolucoes@gmail.com`
+-   **Senha:** `tehokas123`
+
 ## Tecnologias Utilizadas
 
 -   **Backend:** PHP 8.3 + Laravel 11.
