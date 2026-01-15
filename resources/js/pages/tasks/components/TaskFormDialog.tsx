@@ -33,8 +33,18 @@ export default function TaskFormDialog({
         title: '',
         description: '',
         status: 'pendente',
-        deadline: new Date().toISOString().split('T')[0],
+        deadline: getTodayLocal(),
     });
+
+    function getTodayLocal() {
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+
 
     useEffect(() => {
         if (task) {
@@ -42,17 +52,18 @@ export default function TaskFormDialog({
                 title: task.title,
                 description: task.description || '',
                 status: task.status,
-                deadline: task.deadline.split('T')[0],
+                deadline: task.deadline,
             });
         } else {
             setFormData({
                 title: '',
                 description: '',
                 status: 'pendente',
-                deadline: new Date().toISOString().split('T')[0],
+                deadline: getTodayLocal(),
             });
         }
     }, [task, open]);
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -90,7 +101,7 @@ export default function TaskFormDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px] border-sidebar-border/70 dark:border-sidebar-border">
+            <DialogContent className="sm:max-w-[500px] w-full max-w-full overflow-hidden border-sidebar-border/70 dark:border-sidebar-border">
                 <DialogHeader>
                     <DialogTitle className="text-gray-900 dark:text-gray-100">
                         {task ? 'Editar Tarefa' : 'Nova Tarefa'}
@@ -120,7 +131,7 @@ export default function TaskFormDialog({
                             id="description"
                             value={formData.description}
                             onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                            className="mt-1 border-sidebar-border/70 dark:border-sidebar-border"
+                            className="mt-1 w-full max-w-full resize-none overflow-y-auto whitespace-pre-wrap break-all"
                             placeholder="Descreva a tarefa..."
                             rows={3}
                         />
@@ -131,7 +142,6 @@ export default function TaskFormDialog({
                             Prazo *
                         </Label>
                         <div className="mt-1 flex items-center">
-                            <Calendar className="mr-2 h-4 w-4 text-gray-500" />
                             <Input
                                 id="deadline"
                                 type="date"

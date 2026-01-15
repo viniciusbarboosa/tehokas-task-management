@@ -20,7 +20,7 @@ export default function TaskCard({ task, onEdit, onDelete,onViewDetails, isDragg
         transform,
         transition,
         isDragging: isActuallyDragging,
-    } = useSortable({ 
+    } = useSortable({
         id: task.id.toString(),
         data: {
             type: 'task',
@@ -39,7 +39,7 @@ export default function TaskCard({ task, onEdit, onDelete,onViewDetails, isDragg
         const deadline = new Date(task.deadline);
         const diffTime = deadline.getTime() - today.getTime();
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
+
         if (diffDays < 0) return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200';
         if (diffDays <= 3) return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200';
         return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
@@ -76,17 +76,17 @@ export default function TaskCard({ task, onEdit, onDelete,onViewDetails, isDragg
                         )}
                     </div>
                 </div>
-                
+
                 <div className="mt-3 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         {task.deadline && (
                             <div className={`flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-medium ${getPriorityColor()}`}>
                                 <Calendar className="h-3 w-3" />
-                                <span>{new Date(task.deadline).toLocaleDateString('pt-BR')}</span>
+                                <span>{task.deadline.split('-').reverse().join('/')}</span>
                             </div>
                         )}
                     </div>
-                    
+
                     <div className="flex gap-1">
 
                         {onViewDetails && (
@@ -94,11 +94,11 @@ export default function TaskCard({ task, onEdit, onDelete,onViewDetails, isDragg
                                 size="icon"
                                 variant="ghost"
                                 className="h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-200"
-                                onClick={(e) => { 
-                                    e.stopPropagation(); 
-                                    onViewDetails(task); 
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onViewDetails(task);
                                 }}
-                                onPointerDown={(e) => e.stopPropagation()} 
+                                onPointerDown={(e) => e.stopPropagation()}
                             >
                                 <Eye className="h-4 w-4" />
                             </Button>
@@ -109,7 +109,7 @@ export default function TaskCard({ task, onEdit, onDelete,onViewDetails, isDragg
                             variant="ghost"
                             className="h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-200"
                             onClick={(e) => { e.stopPropagation(); onEdit(task); }}
-                            onPointerDown={(e) => e.stopPropagation()} 
+                            onPointerDown={(e) => e.stopPropagation()}
                         >
                             <Pencil className="h-4 w-4" />
                         </Button>
